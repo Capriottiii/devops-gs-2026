@@ -4,10 +4,10 @@ FIAP · Engenharia de Software 4º ano · Global Solution 2026.2 · CitizenTech 
 
 | Item | Link |
 | --- | --- |
-| URL pública do MVP | _preencher com o output `url_site` do Terraform_ |
-| Repositório | _preencher_ |
-| Pipeline (Actions) | _preencher_ |
-| Vídeo do pitch | _preencher_ |
+| URL pública do MVP | http://68.211.147.178/ |
+| Repositório | https://github.com/Capriottiii/devops-gs-2026 |
+
+
 
 ## Ficha Técnica do MVP
 
