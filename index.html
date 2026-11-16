@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#10283B">
+  <title>Alaga Alerta — MVP</title>
+  <meta name="description" content="Alaga Alerta mede a água na própria rua e avisa moradores e motoristas, por bairro, antes do alagamento.">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topo">
+    <div class="wrap barra">
+      <a class="marca" href="#inicio" aria-label="Alaga Alerta, início">
+        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M12 2C8 8 5 11.5 5 15a7 7 0 0 0 14 0c0-3.5-3-7-7-13z" fill="currentColor"/></svg>
+        Alaga Alerta
+      </a>
+      <nav aria-label="Seções">
+        <a href="#problema">O problema</a>
+        <a href="#solucao">A solução</a>
+        <a href="#estados">Estados</a>
+        <a href="#entrega">Esta entrega</a>
+        <a href="#equipe">Equipe</a>
+      </nav>
+    </div>
+
+    <div class="wrap hero" id="inicio">
+      <div class="hero-texto">
+        <p class="selo">FIAP · Global Solution 2026.2 · CitizenTech</p>
+        <h1>Saber que a rua vai alagar antes de a água chegar.</h1>
+        <p class="lead">O alerta de chuva fala da cidade inteira. O alagamento acontece em uma rua. O Alaga Alerta mede a água onde ela sobe e avisa quem mora e circula ali, bairro a bairro, a tempo de sair do caminho.</p>
+      </div>
+
+      <aside class="leitura" aria-label="Exemplo de leitura do sensor">
+        <p class="leitura-tit">Exemplo de leitura · Vila Maria, São Paulo</p>
+        <p class="leitura-estado"><span class="chip perigo">PERIGO</span></p>
+        <dl>
+          <div><dt>Nível da água</dt><dd>112 cm <small>(74,7% do limite)</small></dd></div>
+          <div><dt>Velocidade de subida</dt><dd>9,3% por minuto</dd></div>
+          <div><dt>Confirmação</dt><dd>3 janelas seguidas</dd></div>
+          <div><dt>Sensor</dt><dd>alaga-sensor-01</dd></div>
+        </dl>
+        <p class="leitura-nota">Valores de demonstração do formato que o sensor envia à API.</p>
+      </aside>
+    </div>
+  </header>
+
+  <main>
+    <section id="problema" class="wrap">
+      <h2>O problema: o aviso é da cidade, a enchente é da rua</h2>
+      <div class="duas-colunas">
+        <div class="texto">
+          <p>Em bairros com histórico de alagamento, como a Vila Maria, quem mora ali já sabe o roteiro: chove forte, a rua enche, o carro fica preso, a água entra em casa. O que falta é saber <strong>quando</strong>, e com folga suficiente para agir.</p>
+          <p>Os alertas de chuva existentes são genéricos e chegam tarde. Eles descrevem a chuva prevista para uma região grande, não a água que de fato está subindo na sua esquina. Ninguém mede, em tempo real, <strong>quanto</strong> a água subiu e <strong>com que velocidade</strong>.</p>
+          <p>Sem esse dado local, motorista entra na rua errada, morador descobre o alagamento quando ele já começou e a decisão de sair ou ficar vira palpite.</p>
+        </div>
+
+        <table class="comparativo">
+          <caption>O que muda com o dado local</caption>
+          <thead>
+            <tr><th scope="col"></th><th scope="col">Alerta de chuva comum</th><th scope="col">Alaga Alerta</th></tr>
+          </thead>
+          <tbody>
+            <tr><th scope="row">Escala</th><td>Região inteira</td><td>Rua e bairro</td></tr>
+            <tr><th scope="row">O que olha</th><td>Chuva prevista</td><td>Água medida no local</td></tr>
+            <tr><th scope="row">Velocidade</th><td>Não informa</td><td>Mede a taxa de subida</td></tr>
+            <tr><th scope="row">Mensagem</th><td>Genérica</td><td>Estado da rua e o que fazer</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="solucao" class="wrap">
+      <h2>A solução: um sensor na rua e um aviso que chega a tempo</h2>
+      <p class="intro">Um dispositivo instalado no ponto crítico mede a água continuamente. Só quando a leitura se confirma ele vira alerta, para que o aviso seja confiável e não mais um alarme falso ignorado.</p>
+
+      <ol class="passos">
+        <li>
+          <h3>Medir</h3>
+          <p>Um ESP32 com sensor ultrassônico (HC-SR04) mede a distância até a água e calcula o nível. Também lê gás (MQ-2), temperatura e umidade (DHT22). Em situação normal, envia uma leitura de rotina a cada 30 segundos.</p>
+        </li>
+        <li>
+          <h3>Confirmar</h3>
+          <p>Uma leitura isolada pode ser ruído. O aviso só sai depois de várias janelas seguidas apontando o mesmo estado, e cada evento tem um identificador único, então um reenvio nunca vira alerta duplicado.</p>
+        </li>
+        <li>
+          <h3>Classificar</h3>
+          <p>O dispositivo combina o nível da água e a velocidade de subida e classifica a rua em NORMAL, ATENCAO ou PERIGO. Água alta e parada preocupa menos do que água ainda baixa subindo rápido.</p>
+        </li>
+        <li>
+          <h3>Avisar</h3>
+          <p>A API central recebe o evento por HTTPS e o mapa do bairro mostra o estado de cada ponto. Quando a classe é PERIGO, um fluxo automático (RPA) dispara o aviso a quem está na região.</p>
+        </li>
+      </ol>
+    </section>
+
+    <section id="estados" class="wrap">
+      <h2>Três estados, sempre com cor e com texto</h2>
+      <p class="intro">Cor sozinha não basta: quem tem daltonismo ou olha o celular sob a chuva precisa ler o estado. Por isso a palavra acompanha a cor em todo lugar.</p>
+      <ul class="estados-lista">
+        <li><span class="chip normal">NORMAL</span><p>A água está baixa e estável. Nenhuma ação é necessária; o sensor segue medindo.</p></li>
+        <li><span class="chip atencao">ATENCAO</span><p>A água começou a subir. Vale evitar os pontos mais baixos e acompanhar o mapa.</p></li>
+        <li><span class="chip perigo">PERIGO</span><p>O alagamento é provável e a leitura foi confirmada. Evite a rua e procure um ponto mais alto.</p></li>
+      </ul>
+    </section>
+
+    <section id="ods" class="wrap">
+      <h2>Por que isso importa</h2>
+      <div class="ods">
+        <p><strong>ODS 11 · Cidades e comunidades sustentáveis.</strong> Torna o bairro mais seguro para quem já convive com o alagamento.</p>
+        <p><strong>ODS 13 · Ação contra a mudança do clima.</strong> Chuvas fortes tendem a pesar mais; adaptação local começa por saber o que está acontecendo.</p>
+        <p><strong>ODS 3 e 9 · Saúde e inovação.</strong> Evita acidentes e contato com água de enchente, usando um dispositivo simples e barato.</p>
+      </div>
+    </section>
+
+    <section id="entrega" class="wrap">
+      <h2>Esta entrega: o MVP no ar, com segurança desde o primeiro commit</h2>
+      <p class="intro">Este site é o MVP publicado. Ele existe para provar o caminho do código até a internet: tudo passa por container, infraestrutura como código e um pipeline que barra o que não está seguro.</p>
+      <dl class="entrega">
+        <div><dt>Container</dt><dd>Imagem enxuta de nginx sem privilégio, usuário não root e nenhum segredo dentro. Sobe com <code>docker compose</code>.</dd></div>
+        <div><dt>Nuvem como código</dt><dd>Terraform cria rede, firewall e VM na Azure. O state e as variáveis ficam fora do repositório, e a porta de administração nunca fica aberta para a internet inteira.</dd></div>
+        <div><dt>Pipeline</dt><dd>A cada push: build, <strong>Gitleaks</strong> procurando segredos, <strong>Semgrep</strong> no código e <strong>Trivy</strong> na imagem e na infraestrutura. Só o que passa vai para o ar, de forma automática.</dd></div>
+        <div><dt>Observabilidade</dt><dd>Prometheus e Grafana acompanham latência, tráfego, erros e saturação, e um alerta dispara quando o site cai.</dd></div>
+      </dl>
+    </section>
+
+    <section id="equipe" class="wrap">
+      <h2>Equipe</h2>
+      <ul class="equipe">
+        <li><strong>Manoella Herrerias Waideman</strong><span>RM 98906</span></li>
+        <li><strong>Felipe Capriotti da Silva Santos</strong><span>RM 98460</span></li>
+        <li><strong>Victor Hugo Andrade</strong><span>RM 550996</span></li>
+        <li><strong>Gustavo Kawamura Christofani</strong><span>RM 99679</span></li>
+      </ul>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap"><p>Alaga Alerta · FIAP Global Solution 2026.2 · Engenharia de Software, 4º ano · Secure DevOps &amp; Cloud</p></div>
+  </footer>
+</body>
+</html>
